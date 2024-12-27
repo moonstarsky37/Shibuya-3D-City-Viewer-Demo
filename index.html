@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cesium Viewer</title>
+    <script src="node_modules/cesium/Build/Cesium/Cesium.js"></script>
+    <link href="node_modules/cesium/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        #cesiumContainer {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer"></div>
+    <script>
+        (async function () {
+            // 初始化 Cesium Viewer
+            const terrainProvider = await Cesium.createWorldTerrainAsync();
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+                terrainProvider: terrainProvider,
+                animation: false,
+                timeline: false,
+            });
+
+            // 設定 tileset.json 的目錄清單
+            const tilesets = 
+		[
+    "http://192.168.3.54:8080/13113_shibuya-ku_pref_2023_citygml_1_fld_pref_jonan-chiku_3dtiles_l2/tileset.json",
+    "http://192.168.3.54:8080/13113_shibuya-ku_pref_2023_citygml_1_fld_pref_kandagawa-ryuiki_3dtiles_l2/tileset.json",
+    "http://192.168.3.54:8080/13113_shibuya-ku_pref_2023_citygml_1_op_bldg_3dtiles_13113_shibuya-ku_lod2/tileset.json",
+    //  Adding what you need
+		];
+            // 遍歷 tilesets，動態加載到 Cesium Viewer
+            for (const tilesetUrl of tilesets) {
+                try {
+                    const tileset = await Cesium.Cesium3DTileset.fromUrl(tilesetUrl);
+                    viewer.scene.primitives.add(tileset);
+                    viewer.zoomTo(tileset); // 可選，調整到每個 tileset 的視角
+                } catch (error) {
+                    console.error(`無法加載 ${tilesetUrl}:`, error);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
+
